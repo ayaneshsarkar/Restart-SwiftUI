@@ -10,6 +10,7 @@ import SwiftUI
 struct HomeView: View {
   //Property
   @AppStorage("onboarding") var isOnboardingViewActive: Bool = false
+  @State private var isAnimating: Bool = false
   
   // Body
   var body: some View {
@@ -24,6 +25,11 @@ struct HomeView: View {
           .resizable()
           .scaledToFit()
           .padding()
+          .offset(y: isAnimating ? 35 : -35)
+          .animation(
+            .easeInOut(duration: 4).repeatForever(),
+            value: isAnimating
+          )
       }
       
       // Center
@@ -38,6 +44,10 @@ struct HomeView: View {
       Spacer()
       
       Button {
+        withAnimation {
+          playSound(sound: "success", type: "m4a")
+          isOnboardingViewActive = true
+        }
         isOnboardingViewActive = true
       } label: {
         Image(systemName: "arrow.triangle.2.circlepath.circle.fill")
@@ -50,8 +60,12 @@ struct HomeView: View {
       .buttonStyle(.borderedProminent)
       .buttonBorderShape(.capsule)
       .controlSize(.large)
-      
-      Spacer()
+      .padding()
     } // VStack
+    .onAppear {
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+        isAnimating = true
+      })
+    }
   }
 }
